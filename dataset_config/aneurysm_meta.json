@@ -1,0 +1,58 @@
+{
+  "dt": 0.01,
+  "features": {
+    "Vitesse": {
+      "type": "dynamic",
+      "shape": [
+        400,
+        -1,
+        3
+      ],
+      "dtype": "float32"
+    },
+    "CUP": {
+      "type": "dynamic",
+      "shape": [
+        400,
+        -1,
+        1
+      ],
+      "dtype": "float32"
+    },
+    "CAP": {
+      "type": "dynamic",
+      "shape": [
+        400,
+        -1,
+        1
+      ],
+      "dtype": "float32"
+    },
+    "PhiDBP": {
+      "type": "dynamic",
+      "shape": [
+        400,
+        -1,
+        1
+      ],
+      "dtype": "float32"
+    },
+    "node_type": {
+      "type": "static",
+      "shape": [
+        400,
+        -1,
+        1
+      ],
+      "dtype": "float32"
+    }
+  },
+  "field_names": [
+    "Vitesse",
+    "CUP",
+    "CAP",
+    "PhiDBP",
+    "node_type"
+  ],
+  "trajectory_length": 400
+}

@@ -1,7 +1,7 @@
 {
     "dataset": {
         "extension": "xdmf",
-        "xdmf_folder": "/scratch-big/upelissier/50-Datasets/AnXplore/2d/stent/fixed/fivecycles/train",
+        "xdmf_folder": "dataset/train",
         "meta_path": "dataset_config/aneurysm_meta.json",
         "targets": ["Vitesse", "CUP", "CAP", "PhiDBP"],
         "khop": 1,

@@ -3,9 +3,7 @@
         "extension": "xdmf",
         "xdmf_folder": "dataset/train",
         "meta_path": "dataset_config/aneurysm_meta.json",
-        "targets": ["Vitesse"],
-        "khop": 1,
-        "new_edges_ratio": 0
+        "targets": ["Vitesse"]
     },
     "model": {
         "type": "epd",

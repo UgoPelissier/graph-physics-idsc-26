@@ -3,103 +3,8 @@ from typing import Dict, List, Optional, Union
 import meshio
 import numpy as np
 import torch
-import torch_geometric.transforms as T
 from meshio import Mesh
 from torch_geometric.data import Data
-
-
-def compute_k_hop_edge_index(
-    edge_index: torch.Tensor,
-    num_hops: int,
-    num_nodes: int,
-) -> torch.Tensor:
-    """Computes the k-hop edge index for a given edge index tensor.
-
-    Parameters:
-        edge_index (torch.Tensor): The edge index tensor of shape [2, num_edges].
-        num_hops (int): The number of hops.
-        num_nodes (int): The number of nodes.
-
-    Returns:
-        torch.Tensor: The edge index tensor representing the k-hop edges.
-    """
-    # Build the sparse adjacency matrix
-    edge_index_device = edge_index.device
-    adj = torch.sparse_coo_tensor(
-        edge_index,
-        values=torch.ones(
-            edge_index.size(1), dtype=torch.float32, device=edge_index_device
-        ),
-        size=(num_nodes, num_nodes),
-    ).coalesce()
-
-    adj_k = adj.clone()
-    for _ in range(num_hops - 1):
-        adj_k = adj_k + torch.sparse.mm(adj_k, adj)
-        adj_k = adj_k.coalesce()
-
-        # Remove self-loops
-        indices = adj_k.indices()
-        mask = indices[0] != indices[1]
-        adj_k = torch.sparse_coo_tensor(
-            indices=indices[:, mask],
-            values=adj_k.values()[mask],
-            size=adj_k.size(),
-        ).coalesce()
-
-    khop_edge_index = adj_k.indices()
-    return khop_edge_index
-
-
-def compute_k_hop_graph(
-    graph: Data,
-    num_hops: int,
-    add_edge_features_to_khop: bool = False,
-    device: str = "cpu",
-    world_pos_index_start: int = 0,
-    world_pos_index_end: int = 3,
-) -> Data:
-    """Builds a k-hop mesh graph.
-
-    This implementation constructs the sparse adjacency matrix associated with the mesh graph
-    and computes its powers in a sparse manner.
-
-    Parameters:
-        graph (Data): The input graph data.
-        num_hops (int): The number of hops.
-        add_edge_features_to_khop (bool): Whether to compute edge features for the k-hop graph.
-        device (str): The device to move tensors to.
-
-    Returns:
-        Data: The k-hop graph data.
-    """
-    if num_hops == 1:
-        return graph
-
-    edge_index = graph.edge_index
-    num_nodes = graph.num_nodes
-
-    khop_edge_index = compute_k_hop_edge_index(
-        edge_index=edge_index,
-        num_hops=num_hops,
-        num_nodes=num_nodes,
-    ).to(device)
-
-    # Build k-hop graph
-    khop_mesh_graph = graph.clone()
-    khop_mesh_graph.edge_index = khop_edge_index.to(device)
-
-    # Optionally compute edge features
-    if add_edge_features_to_khop:
-        transforms = [
-            T.Cartesian(norm=False),
-            T.Distance(norm=False),
-        ]
-        edge_feature_computer = T.Compose(transforms)
-        khop_mesh_graph.edge_attr = None
-        khop_mesh_graph = edge_feature_computer(khop_mesh_graph).to(device)
-
-    return khop_mesh_graph
 
 
 def meshdata_to_graph(
@@ -272,23 +177,3 @@ def torch_graph_to_mesh(graph: Data, node_features_mapping: dict[str, int]) -> M
         [(cells_type, cells)],
         point_data=point_data,
     )
-
-
-def get_masked_indexes(graph: Data, masking_ratio: float = 0.15) -> torch.Tensor:
-    """Generate masked indices for the input graph based on the masking ratio.
-
-    Args:
-        graph (Data): The input graph data.
-        masking_ratio (float): The ratio of nodes to mask.
-
-    Returns:
-        selected_indices (Tensor): The indices of nodes to keep after masking.
-    """
-    n, _ = graph.x.shape
-    nodes_to_keep = 1 - masking_ratio
-    num_rows_to_sample = int(nodes_to_keep * n)
-    # Generate random indices
-    random_indices = torch.randperm(n)
-    selected_indices = random_indices[:num_rows_to_sample]
-
-    return selected_indices

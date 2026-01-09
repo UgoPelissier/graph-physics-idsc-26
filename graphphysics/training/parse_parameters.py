@@ -155,8 +155,6 @@ def get_dataset(
     targets = dataset_params.get("targets", [])
     if len(targets) == 0:
         raise ValueError("Please provide a list of target properties to predict.")
-    khop = dataset_params.get("khop", 1)
-    new_edges_ratio = dataset_params.get("new_edges_ratio", 0)
     extension = dataset_params.get("extension", "")
 
     if extension == "xdmf":
@@ -166,8 +164,6 @@ def get_dataset(
             targets=targets,
             preprocessing=preprocessing,
             masking_ratio=masking_ratio,
-            khop=khop,
-            new_edges_ratio=new_edges_ratio,
             add_edge_features=use_edge_feature,
             use_previous_data=use_previous_data,
             switch_to_val=switch_to_val,

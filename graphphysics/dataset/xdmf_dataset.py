@@ -20,8 +20,6 @@ class XDMFDataset(BaseDataset):
         targets: list[str] = None,
         preprocessing: Optional[Callable[[Data], Data]] = None,
         masking_ratio: Optional[float] = None,
-        khop: int = 1,
-        new_edges_ratio: float = 0,
         add_edge_features: bool = True,
         use_previous_data: bool = False,
         switch_to_val: bool = False,
@@ -33,8 +31,6 @@ class XDMFDataset(BaseDataset):
             targets=targets,
             preprocessing=preprocessing,
             masking_ratio=masking_ratio,
-            khop=khop,
-            new_edges_ratio=new_edges_ratio,
             add_edge_features=add_edge_features,
             use_previous_data=use_previous_data,
         )
@@ -182,7 +178,6 @@ class XDMFDataset(BaseDataset):
             id=mesh_id,
             next_data=next_data,
         )
-        # TODO: add target_dt and previous_dt as features per node.
         graph.target_dt = _target_data_index * self.dt
 
         if self.use_previous_data:
@@ -199,10 +194,7 @@ class XDMFDataset(BaseDataset):
         graph = graph.to(self.device)
 
         graph = self._apply_preprocessing(graph)
-        graph = self._apply_k_hop(graph, traj_index)
         graph = self._may_remove_edges_attr(graph)
-        graph = self._add_random_edges(graph)
-        selected_indices = self._get_masked_indexes(graph)
 
         graph.edge_index = (
             graph.edge_index.long() if graph.edge_index is not None else None
@@ -212,7 +204,4 @@ class XDMFDataset(BaseDataset):
         del graph.previous_data
         graph.traj_index = traj_index
 
-        if selected_indices is not None:
-            return graph, selected_indices
-        else:
-            return graph
+        return graph

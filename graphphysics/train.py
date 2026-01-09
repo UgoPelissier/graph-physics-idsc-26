@@ -221,7 +221,6 @@ def main(argv):
             "architecture": parameters["model"]["type"],
             "#_layers": parameters["model"]["message_passing_num"],
             "#_neurons": parameters["model"]["hidden_size"],
-            "#_hops": parameters["dataset"]["khop"],
             "max_lr": initial_lr,
             "batch_size": batch_size,
         }

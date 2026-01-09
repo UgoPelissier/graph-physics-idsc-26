@@ -1,15 +1,15 @@
 export WANDB_MODE=offline
 
 python -m graphphysics.train \
-            --project_name=fixed-2d-stent-vitesse-cup-cap-dbp \
+            --project_name=idsc_26 \
             --training_parameters_path=training_config/aneurysm.json \
-            --num_epochs=100 \
+            --num_epochs=20 \
             --init_lr=0.001 \
             --batch_size=1 \
-            --warmup=1000 \
+            --warmup=1500 \
             --num_workers=0 \
             --prefetch_factor=0 \
             --model_save_name=model \
             --use_previous_data \
-            --previous_data_start 5 \
-            --previous_data_end 10 \
+            --previous_data_start 4 \
+            --previous_data_end 7 \

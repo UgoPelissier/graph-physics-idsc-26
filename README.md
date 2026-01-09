@@ -44,52 +44,7 @@ We use [Weights and Biases](https://wandb.ai/site) to log most information durin
   - per epoch 
 - All Rollout RMSE on validation dataset
 
-## Setup
-
-For local setup, just run the following command to build your environment:
-```
-make install
-```
-
-### Default requirements
-
-```python
-import torch
-
-def format_pytorch_version(version):
-  return version.split('+')[0]
-
-TORCH = 2.8.0
-
-def format_cuda_version(version):
-  return 'cu' + version.replace('.', '')
-
-CUDA_version = torch.version.cuda
-CUDA = format_cuda_version(CUDA_version)
-```
-
-```
-pip install torch-scatter     -f https://pytorch-geometric.com/whl/torch-{TORCH}+{CUDA}.html
-pip install torch-sparse      -f https://pytorch-geometric.com/whl/torch-{TORCH}+{CUDA}.html
-pip install torch-cluster     -f https://pytorch-geometric.com/whl/torch-{TORCH}+{CUDA}.html
-pip install torch-spline-conv -f https://pytorch-geometric.com/whl/torch-{TORCH}+{CUDA}.html
-pip install torch-geometric
-
-pip install numpy=1.26.4
-pip install loguru==0.7.2
-pip install autoflake==2.3.0
-pip install pytest==8.0.1
-pip install meshio==5.3.5
-pip install h5py==3.10.0
-
-!pip install pyvista lightning==2.5.0 wandb "wandb[media]"
-!pip install pytorch-lightning==2.5.0 torchmetrics==1.6.3
-```
-
-
-### WandB
-
-We use Weights and Bias to log most of our metrics and vizualizations during the training. Make sure you create and account, and log in before you start training.
+Make sure you create and account, and log in before you start training.
 
 ```python
 import wandb
@@ -100,22 +55,21 @@ wandb.login()
 
 Most of setting up a new use case depends on two `.json` files: one to define the dataset details, and one for the training settings.
 
-Let's start with the training settings. An example is available [here](https://github.com/DonsetPG/graph-physics/blob/main/training_config/cylinder.json).
+Let's start with the training settings. An example is available [here](https://github.com/UgoPelissier/graph-physics-idsc-26/blob/main/training_config/aneurysm.json).
 
 ### Dataset
 
 ```json 
 "dataset": {
-    "extension": "h5",
-    "h5_path": "dataset/h5_dataset/cylinder_flow/train.h5",
-    "meta_path": "dataset/h5_dataset/cylinder_flow/meta.json",
-    "targets": ["velocity"],
-    "khop": 1
+    "extension": "xdmf",
+    "xdmf_folder": "dataset/train",
+    "meta_path": "dataset_config/aneurysm_meta.json",
+    "targets": ["Vitesse"],
 }
 ```
 
-- `extension`: If the dataset used is h5 or xdmf.
-- `h5_path` (`xdmf_folder` for an xdmf dataset): Path to the dataset.
+- `extension`: If the dataset used is xdmf or h5.
+- `xdmf_folder`: Path to the dataset.
 
 > [!NOTE]  
 > You will need a dataset at the same location with `test` instead of `train` in its name for the validation step to work. Otherwise, you can specify its name directly in `training.py`
@@ -128,8 +82,6 @@ Let's start with the training settings. An example is available [here](https://g
 > The field(s) designated as target(s) must be dynamic. If it is not the case, an error will be raised.   
 > The order in which the fields are defined in `targets` must be the same as that in the `dataset_config` file.     
 > The dynamic fields not designated as targets will be added to `graph.next_data` and will be available for building features, for instance if the user wants to use the velocity boundary conditions of the next time step.
-
-- `khop`: K-hop neighbors size to use. You should start with 1.
 
 You also need to define a few other parameters: 
 

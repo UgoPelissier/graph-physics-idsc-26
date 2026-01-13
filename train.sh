@@ -1,5 +1,3 @@
-export WANDB_MODE=offline
-
 python -m graphphysics.train \
             --project_name=idsc_26 \
             --training_parameters_path=training_config/aneurysm.json \
